@@ -1,0 +1,5 @@
+from name,from index,to name,to index,flow
+f,1,c,2,30
+f,1,b,1,5
+f,1,a,0,4
+g,2,d,3,2
