@@ -4,7 +4,7 @@ import pandas as pd
 def compute_flows(out_acc,in_acc):
     flows = [] # from id, to id, flow
     shortlist_number = 5
-    shorlist_percentage = 10
+    shorlist_percentage = 50
     # out_acc will be of the form [amount of people to move, x, y]
     # in_acc will be of the form [capacity, x, y]
     dnf = []
