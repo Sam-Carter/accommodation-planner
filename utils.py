@@ -92,6 +92,7 @@ parser = argparse.ArgumentParser(description='parser')
 parser.add_argument("-send", "--send_filename", help="Name of input file for send locations", type= str)
 parser.add_argument("-receive", "--receive_filename", help="Name of input file for receive locations", type= str)
 parser.add_argument("-percentage", "--percentage", help="Shortlist percentage number between 0 and 100. High percentage -> less care about distance.", type= float)
+parser.add_argument("-d", "--delimiter", help="delimiter used for files", type= str, default=',')
 args = parser.parse_args()
 
 send_file = args.send_filename
@@ -100,20 +101,22 @@ percentage = args.percentage
 
 
 if send_file is None:
-    out_acc = pd.read_csv('receive.csv', header = None, skiprows=1)
+    out_acc = pd.read_csv('receive.csv', header = None, skiprows=1, delimiter = args.delimiter)
 else:
-    out_acc = pd.read_csv(send_file, header = None, skiprows=1)
+    out_acc = pd.read_csv(send_file, header = None, skiprows=1, delimiter = args.delimiter)
 
 out_names = list(out_acc[0])
 out_acc.drop(columns=0, inplace = True)
 out_acc_list = out_acc.values.tolist()
 
 if receive_file is None:
-    in_acc = pd.read_csv('send.csv', header = None, skiprows=1)
+    in_acc = pd.read_csv('send.csv', header = None, skiprows=1, delimiter = args.delimiter)
 else:
-    in_acc = pd.read_csv(receive_file, header = None, skiprows=1)
+    in_acc = pd.read_csv(receive_file, header = None, skiprows=1, delimiter = args.delimiter)
 
 in_names = list(in_acc[0])
+print(len(in_names))
+print(len(in_acc))
 in_acc.drop(columns=0, inplace = True)
 in_acc_list = in_acc.values.tolist()
 
@@ -124,14 +127,16 @@ else:
 
 flows_header = ['from name', 'from index', 'to name', 'to index', 'flow']
 
+
+
 final_flows = []
 
 for flow in flows:
     from_idx = flow[0]
     to_idx = flow[1]
     value = flow[2]
-    from_name = in_names[from_idx]
-    to_name = out_names[to_idx]
+    from_name = out_names[from_idx]
+    to_name = in_names[to_idx]
     final_flows.append([from_name,from_idx,to_name,to_idx,value])
 
 final_send = []
@@ -140,9 +145,9 @@ for i,send in enumerate(out_acc_result):
 
 send_header = ['name', 'people to move', 'x', 'y']
 send_df = pd.DataFrame(final_send)
-send_df.to_csv('updated_send.csv', header = send_header, index = None)
+send_df.to_csv('updated_send.csv', header = send_header, index = None, sep = args.delimiter)
 flows_df = pd.DataFrame(final_flows)
-flows_df.to_csv('Final Flows.csv', header=flows_header, index=None)
+flows_df.to_csv('Final Flows.csv', header=flows_header, index=None, sep = args.delimiter)
 
-
+flows_df.to_csv()
 print(flows)
