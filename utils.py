@@ -101,7 +101,7 @@ percentage = args.percentage
 
 
 if send_file is None:
-    out_acc = pd.read_csv('receive.csv', header = None, skiprows=1, delimiter = args.delimiter)
+    out_acc = pd.read_csv('send.csv', header = None, skiprows=1, delimiter = args.delimiter)
 else:
     out_acc = pd.read_csv(send_file, header = None, skiprows=1, delimiter = args.delimiter)
 
@@ -110,7 +110,7 @@ out_acc.drop(columns=0, inplace = True)
 out_acc_list = out_acc.values.tolist()
 
 if receive_file is None:
-    in_acc = pd.read_csv('send.csv', header = None, skiprows=1, delimiter = args.delimiter)
+    in_acc = pd.read_csv('receive.csv', header = None, skiprows=1, delimiter = args.delimiter)
 else:
     in_acc = pd.read_csv(receive_file, header = None, skiprows=1, delimiter = args.delimiter)
 
