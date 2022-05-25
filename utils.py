@@ -4,8 +4,7 @@ import argparse
 
 
 def compute_flows(out_acc,in_acc, shortlist_percentage = 20):
-    print(out_acc)
-    print(in_acc)
+
     flows = [] # from id, to id, flow
     shortlist_number = 5
 
@@ -31,18 +30,19 @@ def compute_flows(out_acc,in_acc, shortlist_percentage = 20):
         data = []
         for i,out in enumerate(out_acc):
             distance = ((out[1] - x_r)**2 + (out[2] - y_r)**2)**0.5
-            data.append([i, distance, out[0], min(capacity_r,out[0])])
-        if data is None:
+            if out[0] > 0:
+                data.append([i, distance, out[0], min(capacity_r,out[0])])
+        if len(data) == 0:
             break
-        print('new one')
-        print(data)
+
         df = pd.DataFrame(data)
         df.sort_values(by = 1, ascending = True, inplace = True)
 
 
 
         while capacity_r > 0:
-            print(df)
+            if df.values.shape[0] == 0:
+                break
             closest = df.iloc[0][1]
             sub = df.loc[df[1] > (100 - shortlist_percentage)/100*closest,:]
             sub = sub.loc[sub[3] > 0,:]
@@ -100,7 +100,7 @@ percentage = args.percentage
 
 
 if send_file is None:
-    out_acc = pd.read_csv('send.csv', header = None, skiprows=1)
+    out_acc = pd.read_csv('receive.csv', header = None, skiprows=1)
 else:
     out_acc = pd.read_csv(send_file, header = None, skiprows=1)
 
@@ -109,7 +109,7 @@ out_acc.drop(columns=0, inplace = True)
 out_acc_list = out_acc.values.tolist()
 
 if receive_file is None:
-    in_acc = pd.read_csv('receive.csv', header = None, skiprows=1)
+    in_acc = pd.read_csv('send.csv', header = None, skiprows=1)
 else:
     in_acc = pd.read_csv(receive_file, header = None, skiprows=1)
 
