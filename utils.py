@@ -1,10 +1,14 @@
 import pandas as pd
+import argparse
 
 
-def compute_flows(out_acc,in_acc):
+
+def compute_flows(out_acc,in_acc, shortlist_percentage = 20):
+    print(out_acc)
+    print(in_acc)
     flows = [] # from id, to id, flow
     shortlist_number = 5
-    shorlist_percentage = 50
+
     # out_acc will be of the form [amount of people to move, x, y]
     # in_acc will be of the form [capacity, x, y]
     dnf = []
@@ -28,13 +32,19 @@ def compute_flows(out_acc,in_acc):
         for i,out in enumerate(out_acc):
             distance = ((out[1] - x_r)**2 + (out[2] - y_r)**2)**0.5
             data.append([i, distance, out[0], min(capacity_r,out[0])])
+        if data is None:
+            break
+        print('new one')
+        print(data)
         df = pd.DataFrame(data)
         df.sort_values(by = 1, ascending = True, inplace = True)
 
 
+
         while capacity_r > 0:
+            print(df)
             closest = df.iloc[0][1]
-            sub = df.loc[df[1] > (100 - shorlist_percentage)/100*closest,:]
+            sub = df.loc[df[1] > (100 - shortlist_percentage)/100*closest,:]
             sub = sub.loc[sub[3] > 0,:]
             sub.sort_values(by = 3, ascending= False, inplace= True)
             max_inflow = sub[3].sum()
@@ -78,17 +88,39 @@ def compute_flows(out_acc,in_acc):
 
     return flows,out_acc
 
-out_acc = pd.read_csv('send.csv', header = None)
+parser = argparse.ArgumentParser(description='parser')
+parser.add_argument("-send", "--send_filename", help="Name of input file for send locations", type= str)
+parser.add_argument("-receive", "--receive_filename", help="Name of input file for receive locations", type= str)
+parser.add_argument("-percentage", "--percentage", help="Shortlist percentage number between 0 and 100. High percentage -> less care about distance.", type= float)
+args = parser.parse_args()
+
+send_file = args.send_filename
+receive_file = args.receive_filename
+percentage = args.percentage
+
+
+if send_file is None:
+    out_acc = pd.read_csv('send.csv', header = None, skiprows=1)
+else:
+    out_acc = pd.read_csv(send_file, header = None, skiprows=1)
+
 out_names = list(out_acc[0])
 out_acc.drop(columns=0, inplace = True)
 out_acc_list = out_acc.values.tolist()
 
-in_acc = pd.read_csv('receive.csv', header = None)
+if receive_file is None:
+    in_acc = pd.read_csv('receive.csv', header = None, skiprows=1)
+else:
+    in_acc = pd.read_csv(receive_file, header = None, skiprows=1)
+
 in_names = list(in_acc[0])
 in_acc.drop(columns=0, inplace = True)
 in_acc_list = in_acc.values.tolist()
 
-flows,out_acc_result = compute_flows(out_acc_list,in_acc_list)
+if percentage is None:
+    flows,out_acc_result = compute_flows(out_acc_list,in_acc_list)
+else:
+    flows, out_acc_result = compute_flows(out_acc_list, in_acc_list, percentage)
 
 flows_header = ['from name', 'from index', 'to name', 'to index', 'flow']
 
