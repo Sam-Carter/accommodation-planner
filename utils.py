@@ -20,7 +20,7 @@ def compute_flows(out_acc,in_acc, shortlist_percentage = 20):
 
     out = pd.DataFrame(out_acc)
     into = pd.DataFrame(in_acc)
-    into.sort_values(by=0, ascending=False, inplace=True)
+    into.sort_values(by=0, ascending=True, inplace=True)
     into_idx = list(into.index)
 
     for id in into_idx:
@@ -44,7 +44,7 @@ def compute_flows(out_acc,in_acc, shortlist_percentage = 20):
             if df.values.shape[0] == 0:
                 break
             closest = df.iloc[0][1]
-            sub = df.loc[df[1] > (100 - shortlist_percentage)/100*closest,:]
+            sub = df.loc[df[1] <= (100 + shortlist_percentage)/100*closest,:]
             sub = sub.loc[sub[3] > 0,:]
             sub.sort_values(by = 3, ascending= False, inplace= True)
             max_inflow = sub[3].sum()
@@ -101,7 +101,7 @@ percentage = args.percentage
 
 
 if send_file is None:
-    out_acc = pd.read_csv('send.csv', header = None, skiprows=1, delimiter = args.delimiter)
+    out_acc = pd.read_csv('send2.csv', header = None, skiprows=1, delimiter = args.delimiter)
 else:
     out_acc = pd.read_csv(send_file, header = None, skiprows=1, delimiter = args.delimiter)
 
@@ -110,7 +110,7 @@ out_acc.drop(columns=0, inplace = True)
 out_acc_list = out_acc.values.tolist()
 
 if receive_file is None:
-    in_acc = pd.read_csv('receive.csv', header = None, skiprows=1, delimiter = args.delimiter)
+    in_acc = pd.read_csv('receive2.csv', header = None, skiprows=1, delimiter = args.delimiter)
 else:
     in_acc = pd.read_csv(receive_file, header = None, skiprows=1, delimiter = args.delimiter)
 
